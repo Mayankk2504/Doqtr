@@ -1,0 +1,13 @@
+# General
+.DS_Store
+.env
+.env.local
+*.log
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.vscode/
+.idea/
