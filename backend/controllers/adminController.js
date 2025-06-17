@@ -1,5 +1,8 @@
-
-
+import validator from 'validator'
+import bcrypt from 'bcrypt'
+import {v2 as cloudinary} from 'cloudinary'
+import doctorModel from '../models/doctorModel.js'
+import jwt from 'jsonwebtoken'
 
 // API for adding doctors
 
@@ -7,7 +10,98 @@ export const addDoctor = async (req,res)=>{
 
     try {
         const { name, email, password, speciality, degree, experience, about, fees, address} = req.body
-    } catch (error) {
+        const imageFile = req.file
+
+        //checking for all data to add doctor
+        if(!name || !email || !password || !speciality || !degree || !experience || !about || !fees || !address){
+            return res.json({
+                success:false,
+                message:"Missing statement"
+            })
+        }
+
+        //validating email format
+        if(!validator.isEmail(email)){
+            return res.json({
+                success:false,
+                message:"please enter a valid email"
+            }) 
+        }
+
+        //validating password
+        if(password.length < 8){
+           return res.json({
+                success:false,
+                message:"password length is less than 8"
+            })  
+        }
+
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password,salt)
         
+        //upload image to cloudinary
+        const imageUplaod = await cloudinary.uploader.upload(imageFile.path, {resource_type:"image"})
+        const imageURL = imageUplaod.secure_url
+
+        const doctorData = {
+            name,
+            email,
+            image:imageURL,
+            password:hashedPassword,
+            speciality,
+            degree,
+            experience,
+            about,
+            fees,
+            address:JSON.parse(address),
+            date:Date.now()
+        }
+
+        const newDoctor = new doctorModel(doctorData)
+        await newDoctor.save()
+
+        res.json({
+            success:true,
+            message:"doctor added"
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success:false,
+            message:error.message
+        })
+    }
+}
+
+//API for admin login
+
+export const adminLogin = async(req,res)=>{
+    try {
+        
+        const {email,password} = req.body
+
+        if (email == process.env.ADMIN_EMAIL && password == process.env.ADMIN_PASSWORD) {
+            
+            const token = jwt.sign(email+password,process.env.JWT_SECRET)
+
+            res.json({
+                success:true,
+                token
+            })
+
+        }else{
+            res.json({
+                success:false,
+                message:"Invalid credentials"
+            })
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success:false,
+            message:error.message
+        })
     }
 }
