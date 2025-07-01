@@ -40,8 +40,8 @@ export const addDoctor = async (req,res)=>{
         const hashedPassword = await bcrypt.hash(password,salt)
         
         //upload image to cloudinary
-        const imageUplaod = await cloudinary.uploader.upload(imageFile.path, {resource_type:"image"})
-        const imageURL = imageUplaod.secure_url
+        const imageUpload = await cloudinary.uploader.upload(imageFile.path, {resource_type:"image"})
+        const imageURL = imageUpload.secure_url
 
         const doctorData = {
             name,
