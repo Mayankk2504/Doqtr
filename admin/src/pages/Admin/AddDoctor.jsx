@@ -17,13 +17,17 @@ const AddDoctor = () => {
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const { backendUrl, aToken } = useContext(AdminContext);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
     try {
       if (!docImg) {
+        setLoading(false)
         return toast.error("Image not selected");
       }
 
@@ -54,12 +58,27 @@ const AddDoctor = () => {
       );
 
       if(data.success){
+        setLoading(false);
         toast.success(data.message)
+        setAbout('')
+        setAddress1('')
+        setAddress2('')
+        setDegree('')
+        setDocImg(false)
+        setEmail('')
+        setFees('')
+        setName('')
+        setPassword('')
       }else{
+        setLoading(false);
         toast.error(data.message)
       }
 
-    } catch (error) {}
+    }catch (error) {
+      setLoading(false);
+      toast.error(error.message)
+      console.log(error)
+    }
   };
 
   return (
@@ -221,9 +240,10 @@ const AddDoctor = () => {
 
         <button
           type="submit"
-          className="bg-primary px-10 py-3 mt-4 text-white rounded-full cursor-pointer"
+          disabled={loading}
+          className="bg-primary px-10 py-3 mt-4 text-white rounded-full cursor-pointer disabled:opacity-50"
         >
-          Add doctor
+          {loading ? "Uploading..." : "Add doctor"}
         </button>
       </div>
     </form>
