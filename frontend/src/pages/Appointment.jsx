@@ -1,14 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react'
-import {useParams} from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 import RelatedDoctors from '../components/RelatedDoctors'
+import { toast } from 'react-toastify'
+import axios from 'axios'
 
 const Appointment = () => {
 
   const {docId} = useParams()
-  const {doctors,currencySymbol} = useContext(AppContext)
+  const {doctors,currencySymbol,backendUrl,token,getDoctorsData} = useContext(AppContext)
   const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+
+  const navigate = useNavigate()
 
   const [docInfo,setDocInfo] = useState(null)
   const [docSlots, setDocSlots] = useState([])
@@ -54,6 +58,37 @@ const Appointment = () => {
       }
 
       setDocSlots(prev => ([...prev,timeSlots]))
+    }
+  }
+
+  const bookAppointment = async ()=>{
+    if(!token){
+      toast.warn('Login to book appointment')
+      return navigate('/login')
+    }
+    try {
+      const date = docSlots[slotIndex][0].datetime
+
+      let day = date.getDate()
+      let month = date.getMonth()+1
+      let year = date.getFullYear()
+
+      const slotDate = day+"_"+month+"_"+year
+      
+      const {data} = await axios.post(backendUrl+'/api/user/book-appointment',{docId,slotDate,slotTime},{headers:{token}})
+
+      if(data.success){
+        toast.success(data.message)
+        getDoctorsData()
+        navigate('/my-appointments')
+      }else{
+        toast.error(data.message)
+      }
+      
+
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message)
     }
   }
 
@@ -128,7 +163,7 @@ const Appointment = () => {
             </p>
           ))}
         </div>
-        <button className='bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-16'>Book an Appointment</button>
+        <button onClick={bookAppointment} className='bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-16 cursor-pointer'>Book an Appointment</button>
       </div>
 
       {/*-------- Listing related doctors ---------*/}
