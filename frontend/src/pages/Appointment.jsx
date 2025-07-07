@@ -20,6 +20,8 @@ const Appointment = () => {
   const [slotTime, setSlotTime] = useState('')
 
   const getAvailableSlots = async () => {
+    if (!docInfo) return;
+
     setDocSlots([])
 
     //getting current date
@@ -49,10 +51,22 @@ const Appointment = () => {
       while(currentDate < endTime){
         let formattedTime = currentDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
 
-        timeSlots.push({
-          datetime: new Date(currentDate),
-          time: formattedTime
-        })
+        let day = currentDate.getDate()
+        let month = currentDate.getMonth()+1
+        let year = currentDate.getFullYear()
+
+        const slotDate = day+"_"+month+"_"+year
+
+        const isSlotAvialable = docInfo.slots_booked[slotDate] && docInfo.slots_booked[slotDate].includes(formattedTime) ? false : true
+
+        if(isSlotAvialable){
+          timeSlots.push({
+            datetime: new Date(currentDate),
+            time: formattedTime
+          }) 
+        }
+
+        
 
         currentDate.setMinutes(currentDate.getMinutes() + 30)
       }
