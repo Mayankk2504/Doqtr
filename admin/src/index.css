@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 @theme {
-    --color-primary : #5f6FFF
+    --color-primary : #40E0D0
 }
 
 ::-webkit-scrollbar{
@@ -12,3 +12,4 @@
 *{
     font-family: Outfit;
 }
+/*#5f6FFF*/
