@@ -13,9 +13,10 @@ const AllAppointments = () => {
   useEffect(()=>{
     if(aToken){
       getAllAppointments()
-      console.log(appointments)
     }
   },[aToken])
+
+
 
 
   return (
