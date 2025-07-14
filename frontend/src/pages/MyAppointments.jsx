@@ -21,13 +21,14 @@ const MyAppointments = () => {
     "Jul",
     "Aug",
     "Sep",
+    "oct",
     "Nov",
     "Dec",
   ];
 
   const slotDateFormat = (slotDate) => {
     const dateArr = slotDate.split("_");
-    return dateArr[0] + " " + months[Number(dateArr[1])] + " " + dateArr[2];
+    return dateArr[0] + " " + months[Number(dateArr[1])-1] + " " + dateArr[2];
   };
 
   const getAppointments = async () => {
