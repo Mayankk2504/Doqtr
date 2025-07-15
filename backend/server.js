@@ -18,6 +18,13 @@ app.use(express.json())
 app.use(cors())
 
 //api endpoints
+
+// --- Health‑check route ------------------------------
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+// -----------------------------------------------------
+
 app.use('/api/admin',adminRouter)
 app.use('/api/doctor',doctorRouter)
 app.use('/api/user',userRouter)
